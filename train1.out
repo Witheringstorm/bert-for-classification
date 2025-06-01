@@ -1,0 +1,97 @@
+Using device: cuda
+Loading training data from: /public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_cn/data/processed/train_cn.csv
+Loading test data from: /public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_cn/data/processed/test_cn.csv
+Training data shape: (24000, 2)
+Test data shape: (6000, 2)
+Epoch 1/10
+----------
+Training model...
+
+Train loss 0.46594342589378357 accuracy 0.7602083333333333
+Evaluating model...
+
+Test loss 0.529181957244873 accuracy 0.7656666666666666
+Test Precision: 0.7085 | Recall: 0.9027 | F1-score: 0.7939
+Saved new best model with accuracy: 0.7657 to /public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_cn/models/best_model_state_cn.bin
+Epoch 2/10
+----------
+Training model...
+Train loss 0.2450878918170929 accuracy 0.8895416666666667
+Test loss 0.5974670648574829 accuracy 0.7926666666666666
+Test Precision: 0.7340 | Recall: 0.9180 | F1-score: 0.8158
+Saved new best model with accuracy: 0.7927 to /public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_cn/models/best_model_state_cn.bin
+Epoch 3/10
+----------
+Training model...
+
+Train loss 0.15725815296173096 accuracy 0.9307916666666667
+Evaluating model...
+
+Test loss 0.7779711484909058 accuracy 0.7969999999999999
+Test Precision: 0.7341 | Recall: 0.9313 | F1-score: 0.8210
+Saved new best model with accuracy: 0.7970 to /public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_cn/models/best_model_state_cn.bin
+Epoch 4/10
+----------
+Training model...
+
+Train loss 0.11573995649814606 accuracy 0.94875
+Evaluating model...
+
+Test loss 0.8342087864875793 accuracy 0.8031666666666666
+Test Precision: 0.7451 | Recall: 0.9217 | F1-score: 0.8240
+Saved new best model with accuracy: 0.8032 to /public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_cn/models/best_model_state_cn.bin
+Epoch 5/10
+----------
+Training model...
+
+Train loss 0.0853796899318695 accuracy 0.9609166666666666
+Evaluating model...
+
+Test loss 0.9265208840370178 accuracy 0.7988333333333333
+Test Precision: 0.7411 | Recall: 0.9187 | F1-score: 0.8204
+Epoch 6/10
+----------
+Training model...
+
+Train loss 0.06903479248285294 accuracy 0.967625
+Evaluating model...
+
+Test loss 1.6358875036239624 accuracy 0.7264999999999999
+Test Precision: 0.6571 | Recall: 0.9473 | F1-score: 0.7760
+Epoch 7/10
+----------
+Training model...
+
+Train loss 0.05616172403097153 accuracy 0.9730416666666666
+Evaluating model...
+
+Test loss 1.7108972072601318 accuracy 0.7428333333333333
+Test Precision: 0.6754 | Recall: 0.9350 | F1-score: 0.7843
+Epoch 8/10
+----------
+Training model...
+
+Train loss 0.0463995561003685 accuracy 0.9766666666666667
+Evaluating model...
+
+Test loss 1.6370435953140259 accuracy 0.7596666666666666
+Test Precision: 0.6916 | Recall: 0.9373 | F1-score: 0.7959
+Epoch 9/10
+----------
+Training model...
+
+Train loss 0.04059123620390892 accuracy 0.979375
+Evaluating model...
+
+Test loss 1.5742703676223755 accuracy 0.7701666666666667
+Test Precision: 0.7022 | Recall: 0.9383 | F1-score: 0.8033
+Epoch 10/10
+----------
+Training model...
+
+Train loss 0.03687920793890953 accuracy 0.9812916666666667
+Evaluating model...
+
+Test loss 1.7596126794815063 accuracy 0.7541666666666667
+Test Precision: 0.6845 | Recall: 0.9430 | F1-score: 0.7932
+Training complete.

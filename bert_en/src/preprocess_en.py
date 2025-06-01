@@ -1,0 +1,113 @@
+import os
+import glob
+import pandas as pd
+from sklearn.model_selection import train_test_split
+import tqdm
+
+# Configuration for English data preprocessing
+BASE_RAW_DATA_PATH = "../../Dataset/ghostbuster-data/"
+PROCESSED_DATA_OUTPUT_PATH = "../data/processed/" # Relative to bert_en/src/
+os.makedirs(PROCESSED_DATA_OUTPUT_PATH, exist_ok=True)
+
+# Define the domains and LLM types to include
+DOMAINS = ["wp", "reuter", "essay"] # Add other domains if present and relevant
+LLM_TYPES = ["gpt", "claude"] # Add other LLM generator types if present and relevant
+
+def load_english_txt_files(directory_path):
+    """Loads text data from all .txt files in a directory."""
+    texts = []
+    if not os.path.isdir(directory_path):
+        print(f"Warning: Directory not found {directory_path}")
+        return texts
+        
+    file_paths = glob.glob(os.path.join(directory_path, "*.txt"))
+    for txt_file in tqdm.tqdm(file_paths, desc=f"Processing files in {os.path.basename(directory_path)}"):
+        try:
+            with open(txt_file, 'r', encoding='utf-8') as f:
+                texts.append(f.read())
+        except Exception as e:
+            print(f"Error loading file {txt_file}: {e}")
+    return texts
+
+def main():
+    all_human_texts = []
+    all_llm_texts = []
+
+    print("Loading English human-written texts...")
+    for domain in DOMAINS:
+        human_domain_path = os.path.join(BASE_RAW_DATA_PATH, domain, "human")
+        print(f"Loading from: {human_domain_path}")
+        domain_human_texts = load_english_txt_files(human_domain_path)
+        all_human_texts.extend(domain_human_texts)
+        print(f"Loaded {len(domain_human_texts)} texts from {domain}/human. Total human texts: {len(all_human_texts)}")
+
+    print("\nLoading English LLM-generated texts...")
+    for domain in DOMAINS:
+        for llm_type in LLM_TYPES:
+            llm_domain_path = os.path.join(BASE_RAW_DATA_PATH, domain, llm_type)
+            print(f"Loading from: {llm_domain_path}")
+            domain_llm_texts = load_english_txt_files(llm_domain_path)
+            all_llm_texts.extend(domain_llm_texts)
+            print(f"Loaded {len(domain_llm_texts)} texts from {domain}/{llm_type}. Total LLM texts: {len(all_llm_texts)}")
+
+    print(f"\nTotal human texts loaded: {len(all_human_texts)}")
+    print(f"Total LLM texts loaded: {len(all_llm_texts)}")
+
+    if not all_human_texts and not all_llm_texts:
+        print("No data loaded. Exiting.")
+        return
+
+    # Create labels
+    human_labels = [0] * len(all_human_texts)
+    llm_labels = [1] * len(all_llm_texts)
+
+    all_texts = all_human_texts + all_llm_texts
+    all_labels = human_labels + llm_labels
+    
+    if not all_texts or not all_labels or len(all_texts) != len(all_labels):
+        print("Data and label mismatch or empty data. Cannot proceed with splitting.")
+        return
+
+    # Split data
+    # Stratification requires at least 2 samples per class if num_classes > 1.
+    num_unique_labels = len(set(all_labels))
+    can_stratify = False
+    if num_unique_labels > 1:
+        label_counts = pd.Series(all_labels).value_counts()
+        if all(count >= 2 for count in label_counts): # Check if all classes have at least 2 samples
+            can_stratify = True
+        else:
+            print("Warning: Not all classes have at least 2 samples for stratification. Stratification will be disabled if any class has < 2 samples.")
+            # Forcibly disable if any class has < 2, as train_test_split might error or behave unexpectedly
+            if any(count < 2 for count in label_counts):
+                 can_stratify = False
+    elif num_unique_labels == 1:
+        print("Warning: Only one class present in the data. Stratification will be disabled.")
+        can_stratify = False # Explicitly disable
+    else: # No labels
+        print("No labels found. Cannot stratify.")
+        can_stratify = False
+
+
+    train_texts, test_texts, train_labels, test_labels = train_test_split(
+        all_texts, all_labels, test_size=0.2, random_state=42,
+        stratify=all_labels if can_stratify else None
+    )
+
+    print(f"\nEnglish data: {len(train_texts)} train, {len(test_texts)} test examples.")
+
+    # Save to CSV
+    df_train = pd.DataFrame({'text': train_texts, 'label': train_labels})
+    df_test = pd.DataFrame({'text': test_texts, 'label': test_labels})
+
+    train_output_file = os.path.join(PROCESSED_DATA_OUTPUT_PATH, "train_en.csv")
+    test_output_file = os.path.join(PROCESSED_DATA_OUTPUT_PATH, "test_en.csv")
+
+    df_train.to_csv(train_output_file, index=False, encoding='utf-8')
+    df_test.to_csv(test_output_file, index=False, encoding='utf-8')
+
+    print(f"Saved English training data to: {train_output_file}")
+    print(f"Saved English testing data to: {test_output_file}")
+
+if __name__ == "__main__":
+    main() 
