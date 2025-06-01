@@ -4,3 +4,5 @@ Dataset
 1
 bert_cn/data
 bert_en/data
+bert_en/models
+bert_en/bert-base-uncased

@@ -3,10 +3,11 @@ import glob
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import tqdm
+import random # Added for sampling
 
 # Configuration for English data preprocessing
-BASE_RAW_DATA_PATH = "../../Dataset/ghostbuster-data/"
-PROCESSED_DATA_OUTPUT_PATH = "../data/processed/" # Relative to bert_en/src/
+BASE_RAW_DATA_PATH = "/public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/Dataset/ghostbuster-data"
+PROCESSED_DATA_OUTPUT_PATH = "/public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_en/data/processed" # Relative to bert_en/src/
 os.makedirs(PROCESSED_DATA_OUTPUT_PATH, exist_ok=True)
 
 # Define the domains and LLM types to include
@@ -32,6 +33,7 @@ def load_english_txt_files(directory_path):
 def main():
     all_human_texts = []
     all_llm_texts = []
+    random.seed(42) # For reproducible sampling
 
     print("Loading English human-written texts...")
     for domain in DOMAINS:
@@ -53,11 +55,27 @@ def main():
     print(f"\nTotal human texts loaded: {len(all_human_texts)}")
     print(f"Total LLM texts loaded: {len(all_llm_texts)}")
 
-    if not all_human_texts and not all_llm_texts:
-        print("No data loaded. Exiting.")
+    if not all_human_texts or not all_llm_texts: # Ensure both lists have data before balancing
+        print("One or both text lists are empty. Cannot balance or proceed. Exiting.")
         return
 
-    # Create labels
+    # Balance the number of samples per class by undersampling the majority class
+    num_human = len(all_human_texts)
+    num_llm = len(all_llm_texts)
+
+    if num_llm > num_human:
+        print(f"Undersampling LLM texts from {num_llm} to {num_human} to match human texts.")
+        all_llm_texts = random.sample(all_llm_texts, num_human)
+    elif num_human > num_llm:
+        print(f"Undersampling Human texts from {num_human} to {num_llm} to match LLM texts.")
+        all_human_texts = random.sample(all_human_texts, num_llm)
+    else:
+        print("Human and LLM text counts are already equal.")
+
+    print(f"Balanced human texts: {len(all_human_texts)}")
+    print(f"Balanced LLM texts: {len(all_llm_texts)}")
+
+    # Create labels for the balanced lists
     human_labels = [0] * len(all_human_texts)
     llm_labels = [1] * len(all_llm_texts)
 
@@ -65,36 +83,29 @@ def main():
     all_labels = human_labels + llm_labels
     
     if not all_texts or not all_labels or len(all_texts) != len(all_labels):
-        print("Data and label mismatch or empty data. Cannot proceed with splitting.")
+        print("Data and label mismatch or empty data after balancing. Cannot proceed with splitting.")
         return
 
     # Split data
-    # Stratification requires at least 2 samples per class if num_classes > 1.
     num_unique_labels = len(set(all_labels))
     can_stratify = False
     if num_unique_labels > 1:
         label_counts = pd.Series(all_labels).value_counts()
-        if all(count >= 2 for count in label_counts): # Check if all classes have at least 2 samples
+        if all(count >= 2 for count in label_counts):
             can_stratify = True
         else:
-            print("Warning: Not all classes have at least 2 samples for stratification. Stratification will be disabled if any class has < 2 samples.")
-            # Forcibly disable if any class has < 2, as train_test_split might error or behave unexpectedly
-            if any(count < 2 for count in label_counts):
-                 can_stratify = False
+            print("Warning: Not all classes have at least 2 samples for stratification. Stratification will be disabled.")
     elif num_unique_labels == 1:
         print("Warning: Only one class present in the data. Stratification will be disabled.")
-        can_stratify = False # Explicitly disable
-    else: # No labels
+    else:
         print("No labels found. Cannot stratify.")
-        can_stratify = False
-
 
     train_texts, test_texts, train_labels, test_labels = train_test_split(
         all_texts, all_labels, test_size=0.2, random_state=42,
         stratify=all_labels if can_stratify else None
     )
 
-    print(f"\nEnglish data: {len(train_texts)} train, {len(test_texts)} test examples.")
+    print(f"\nEnglish data (balanced): {len(train_texts)} train, {len(test_texts)} test examples.")
 
     # Save to CSV
     df_train = pd.DataFrame({'text': train_texts, 'label': train_labels})
