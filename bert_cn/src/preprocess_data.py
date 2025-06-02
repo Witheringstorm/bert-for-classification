@@ -86,7 +86,7 @@ def load_chinese_json_data(file_path):
                         else:
                             print(f"Warning: Missing corresponding output segment for key '{key}' in generated file {file_path}")
                     else:
-                    print(f"Warning: Generated file {file_path} does not have dictionary structures for 'input' and 'output' fields. Input type: {type(input_segments_map)}, Output type: {type(output_segments_map)}")
+                        print(f"Warning: Generated file {file_path} does not have dictionary structures for 'input' and 'output' fields. Input type: {type(input_segments_map)}, Output type: {type(output_segments_map)}")
             else:
                 print(f"Warning: Top-level JSON structure in {file_path} is neither a list nor a dict: {type(data)}")
 
@@ -159,7 +159,7 @@ def main():
             temp_label_counts = pd.Series(temp_labels_cn).value_counts()
             if all(count >= min_samples_for_stratify_temp // len(set(temp_labels_cn)) for count in temp_label_counts) and all(count >=1 for count in temp_label_counts): # ensure at least 1 sample per class for the second split if stratifying
                  can_stratify_temp = True
-    else:
+            else:
                 print(f"Warning: Cannot stratify temp split. Label counts: {temp_label_counts}. Min samples required per class for strat: {min_samples_for_stratify_temp // len(set(temp_labels_cn)) if len(set(temp_labels_cn)) > 0 else 'N/A'}")
         elif temp_labels_cn and len(set(temp_labels_cn)) == 1:
             print("Warning: Only one class present in the temporary data for val/test split. Stratification disabled for this split.")
@@ -172,7 +172,7 @@ def main():
             val_texts_cn, test_texts_cn, val_labels_cn, test_labels_cn = train_test_split(
                 temp_texts_cn, temp_labels_cn, test_size=0.5, random_state=42, # 0.5 of 0.2 gives 0.1 for test
                 stratify=temp_labels_cn if can_stratify_temp else None
-        )
+            )
             print(f"Chinese data: {len(train_texts_cn)} train, {len(val_texts_cn)} validation, {len(test_texts_cn)} test examples.")
         else: # temp_texts_cn was empty
              val_texts_cn, test_texts_cn, val_labels_cn, test_labels_cn = [], [], [], []
