@@ -1,0 +1,384 @@
+\documentclass{article}
+\usepackage{booktabs} % For professional looking tables
+\usepackage{multirow} % For multi-row cells
+\usepackage{graphicx} % For rotating text, resizebox
+\usepackage{amsmath}  % For \text{} in math mode
+\usepackage{array}    % For custom column types
+\usepackage{verbatim} % For the classification report
+\usepackage{geometry} % For adjusting margins if needed
+\usepackage{caption}  % For more caption control
+\usepackage{lscape}   % For landscape pages if tables are too wide
+
+\geometry{a4paper, margin=1in} % Adjust margins
+
+\begin{document}
+\section*{Bert (English)}
+\begin{table}[htbp]
+\centering
+\caption{Cross-Domain Evaluation Results (F1 Binary / Accuracy)}
+\label{tab:cross_domain_summary_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\multirow{2}{*}{\textbf{Train Domain}} & \multicolumn{3}{c}{\textbf{Test Domain}} \\
+\cmidrule(lr){2-4}
+ & \textbf{Essay} & \textbf{Reuter} & \textbf{WP} \\
+\midrule
+\textbf{Essay} & \textbf{0.985 / 0.985} & 0.638 / 0.490 & 0.833 / 0.805 \\
+\textbf{Reuter} & 0.671 / 0.505 & \textbf{0.995 / 0.995} & 0.907 / 0.900 \\
+\textbf{WP} & 0.727 / 0.621 & 0.810 / 0.770 & \textbf{0.965 / 0.965} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+\section*{Bert (Chinese)}
+
+% Results for Bert (Chinese)
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Bert (Chinese) (Best model from epoch 4)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.8353 \\
+Avg. Loss & 0.5199 \\
+Precision (Binary) & 0.7955 \\
+Recall (Binary) & 0.9027 \\
+F1-score (Binary) & 0.8457 \\
+Precision (Macro) & 0.8415 \\
+Recall (Macro) & 0.8353 \\
+F1-score (Macro) & 0.8346 \\
+Precision (Weighted) & 0.8415 \\
+Recall (Weighted) & 0.8353 \\
+F1-score (Weighted) & 0.8346 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\centering
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+ & \textbf{precision} & \textbf{recall} & \textbf{f1-score} & \textbf{support} \\
+\midrule
+human (0) & 0.89 & 0.77 & 0.82 & 1500 \\
+llm (1) & 0.80 & 0.90 & 0.85 & 1500 \\
+\midrule
+accuracy &  &  & 0.84 & 3000 \\
+macro avg & 0.84 & 0.84 & 0.83 & 3000 \\
+weighted avg & 0.84 & 0.84 & 0.83 & 3000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\clearpage
+\subsection*{Detailed Cross-Domain Evaluation Results}
+
+% Data from JSON - Manually transcribed for this example
+% In a programmatic environment, this would be looped and parsed.
+
+% Result 1: Train Essay, Test Essay
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on Essay, Tested on Essay (Best model from epoch 3)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.9848 \\
+Avg. Loss & 0.2429 \\
+Precision (Binary) & 0.9802 \\
+Recall (Binary) & 0.9900 \\
+F1-score (Binary) & 0.9851 \\
+Precision (Macro) & 0.9849 \\
+Recall (Macro) & 0.9848 \\
+F1-score (Macro) & 0.9848 \\
+Precision (Weighted) & 0.9849 \\
+Recall (Weighted) & 0.9848 \\
+F1-score (Weighted) & 0.9848 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       0.99      0.98      0.98        98
+     llm (1)       0.98      0.99      0.99       100
+
+    accuracy                           0.98       198
+   macro avg       0.98      0.98      0.98       198
+weighted avg       0.98      0.98      0.98       198
+\end{verbatim}
+\end{table}
+
+% Result 2: Train Essay, Test Reuter
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on Essay, Tested on Reuter (Best model from epoch 3)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.4900 \\
+Avg. Loss & 2.7604 \\
+Precision (Binary) & 0.4945 \\
+Recall (Binary) & 0.9000 \\
+F1-score (Binary) & 0.6383 \\
+Precision (Macro) & 0.4695 \\
+Recall (Macro) & 0.4900 \\
+F1-score (Macro) & 0.3869 \\
+Precision (Weighted) & 0.4695 \\
+Recall (Weighted) & 0.4900 \\
+F1-score (Weighted) & 0.3869 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       0.44      0.08      0.14       100
+     llm (1)       0.49      0.90      0.64       100
+
+    accuracy                           0.49       200
+   macro avg       0.47      0.49      0.39       200
+weighted avg       0.47      0.49      0.39       200
+\end{verbatim}
+\end{table}
+
+% Result 3: Train Essay, Test WP
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on Essay, Tested on WP (Best model from epoch 3)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.8050 \\
+Avg. Loss & 0.6589 \\
+Precision (Binary) & 0.7293 \\
+Recall (Binary) & 0.9700 \\
+F1-score (Binary) & 0.8326 \\
+Precision (Macro) & 0.8423 \\
+Recall (Macro) & 0.8050 \\
+F1-score (Macro) & 0.7995 \\
+Precision (Weighted) & 0.8423 \\
+Recall (Weighted) & 0.8050 \\
+F1-score (Weighted) & 0.7995 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       0.96      0.64      0.77       100
+     llm (1)       0.73      0.97      0.83       100
+
+    accuracy                           0.81       200
+   macro avg       0.84      0.80      0.80       200
+weighted avg       0.84      0.81      0.80       200
+\end{verbatim}
+\end{table}
+
+% Result 4: Train Reuter, Test Essay
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on Reuter, Tested on Essay (Best model from epoch 4)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.5051 \\
+Avg. Loss & 3.3068 \\
+Precision (Binary) & 0.5051 \\
+Recall (Binary) & 1.0000 \\
+F1-score (Binary) & 0.6711 \\
+Precision (Macro) & 0.2525 \\
+Recall (Macro) & 0.5000 \\
+F1-score (Macro) & 0.3356 \\
+Precision (Weighted) & 0.2551 \\
+Recall (Weighted) & 0.5051 \\
+F1-score (Weighted) & 0.3390 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       0.00      0.00      0.00        98
+     llm (1)       0.51      1.00      0.67       100
+
+    accuracy                           0.51       198
+   macro avg       0.25      0.50      0.34       198
+weighted avg       0.26      0.51      0.34       198
+\end{verbatim}
+\end{table}
+
+% Result 5: Train Reuter, Test Reuter
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on Reuter, Tested on Reuter (Best model from epoch 4)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.9950 \\
+Avg. Loss & 0.0110 \\
+Precision (Binary) & 1.0000 \\
+Recall (Binary) & 0.9900 \\
+F1-score (Binary) & 0.9950 \\
+Precision (Macro) & 0.9950 \\
+Recall (Macro) & 0.9950 \\
+F1-score (Macro) & 0.9950 \\
+Precision (Weighted) & 0.9950 \\
+Recall (Weighted) & 0.9950 \\
+F1-score (Weighted) & 0.9950 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       0.99      1.00      1.00       100
+     llm (1)       1.00      0.99      0.99       100
+
+    accuracy                           0.99       200
+   macro avg       1.00      0.99      0.99       200
+weighted avg       1.00      0.99      0.99       200
+\end{verbatim}
+\end{table}
+
+% Result 6: Train Reuter, Test WP
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on Reuter, Tested on WP (Best model from epoch 4)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.9000 \\
+Avg. Loss & 0.2889 \\
+Precision (Binary) & 0.8509 \\
+Recall (Binary) & 0.9700 \\
+F1-score (Binary) & 0.9065 \\
+Precision (Macro) & 0.9080 \\
+Recall (Macro) & 0.9000 \\
+F1-score (Macro) & 0.8995 \\
+Precision (Weighted) & 0.9080 \\
+Recall (Weighted) & 0.9000 \\
+F1-score (Weighted) & 0.8995 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       0.97      0.83      0.89       100
+     llm (1)       0.85      0.97      0.91       100
+
+    accuracy                           0.90       200
+   macro avg       0.91      0.90      0.90       200
+weighted avg       0.91      0.90      0.90       200
+\end{verbatim}
+\end{table}
+
+% Result 7: Train WP, Test Essay
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on WP, Tested on Essay (Best model from epoch 3)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.6212 \\
+Avg. Loss & 1.4171 \\
+Precision (Binary) & 0.5714 \\
+Recall (Binary) & 1.0000 \\
+F1-score (Binary) & 0.7273 \\
+Precision (Macro) & 0.7857 \\
+Recall (Macro) & 0.6173 \\
+F1-score (Macro) & 0.5537 \\
+Precision (Weighted) & 0.7835 \\
+Recall (Weighted) & 0.6212 \\
+F1-score (Weighted) & 0.5555 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       1.00      0.23      0.38        98
+     llm (1)       0.57      1.00      0.73       100
+
+    accuracy                           0.62       198
+   macro avg       0.79      0.62      0.55       198
+weighted avg       0.78      0.62      0.56       198
+\end{verbatim}
+\end{table}
+
+% Result 8: Train WP, Test Reuter
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on WP, Tested on Reuter (Best model from epoch 3)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.7700 \\
+Avg. Loss & 0.5862 \\
+Precision (Binary) & 0.6901 \\
+Recall (Binary) & 0.9800 \\
+F1-score (Binary) & 0.8099 \\
+Precision (Macro) & 0.8278 \\
+Recall (Macro) & 0.7700 \\
+F1-score (Macro) & 0.7594 \\
+Precision (Weighted) & 0.8278 \\
+Recall (Weighted) & 0.7700 \\
+F1-score (Weighted) & 0.7594 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       0.97      0.56      0.71       100
+     llm (1)       0.69      0.98      0.81       100
+
+    accuracy                           0.77       200
+   macro avg       0.83      0.77      0.76       200
+weighted avg       0.83      0.77      0.76       200
+\end{verbatim}
+\end{table}
+
+% Result 9: Train WP, Test WP
+\begin{table}[htbp]
+\centering
+\caption*{Detailed Results: Trained on WP, Tested on WP (Best model from epoch 3)}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+Accuracy & 0.9650 \\
+Avg. Loss & 0.0894 \\
+Precision (Binary) & 0.9604 \\
+Recall (Binary) & 0.9700 \\
+F1-score (Binary) & 0.9652 \\
+Precision (Macro) & 0.9650 \\
+Recall (Macro) & 0.9650 \\
+F1-score (Macro) & 0.9650 \\
+Precision (Weighted) & 0.9650 \\
+Recall (Weighted) & 0.9650 \\
+F1-score (Weighted) & 0.9650 \\
+\bottomrule
+\end{tabular}
+\subsection*{Classification Report}
+\begin{verbatim}
+              precision    recall  f1-score   support
+
+   human (0)       0.97      0.96      0.96       100
+     llm (1)       0.96      0.97      0.97       100
+
+    accuracy                           0.96       200
+   macro avg       0.97      0.96      0.96       200
+weighted avg       0.97      0.96      0.96       200
+\end{verbatim}
+\end{table}
+
+\end{document}
