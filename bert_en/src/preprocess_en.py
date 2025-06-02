@@ -14,15 +14,43 @@ os.makedirs(PROCESSED_DATA_OUTPUT_PATH, exist_ok=True)
 DOMAINS = ["wp", "reuter", "essay"] # Add other domains if present and relevant
 LLM_TYPES = ["gpt", "claude"] # Add other LLM generator types if present and relevant
 
-def load_english_txt_files(directory_path):
-    """Loads text data from all .txt files in a directory."""
+def load_english_txt_files(directory_path, desc_prefix="Processing files in"):
+    """Loads text data from all .txt files in a directory.
+    If no .txt files are found directly, it searches one level deeper in subdirectories.
+    """
     texts = []
     if not os.path.isdir(directory_path):
         print(f"Warning: Directory not found {directory_path}")
         return texts
-        
+    
+    # Try loading .txt files directly from the directory_path
     file_paths = glob.glob(os.path.join(directory_path, "*.txt"))
-    for txt_file in tqdm.tqdm(file_paths, desc=f"Processing files in {os.path.basename(directory_path)}"):
+    
+    current_desc_base = os.path.basename(directory_path)
+
+    if not file_paths: # If no .txt files found directly, look into subdirectories
+        subdirectories = [d for d in os.listdir(directory_path) if os.path.isdir(os.path.join(directory_path, d))]
+        if subdirectories:
+            for subdir_name in subdirectories:
+                # We only want to go one level deeper. If subdir_name is 'logprobs' or 'headlines', skip it.
+                # This is a simple heuristic; actual .txt files should not be in these utility folders.
+                if subdir_name.lower() in ["logprobs", "headlines"]:
+                    continue 
+                subdir_path = os.path.join(directory_path, subdir_name)
+                # Update description for tqdm to show the subdirectory being processed
+                desc = f"{desc_prefix} {current_desc_base}/{subdir_name}"
+                subdir_file_paths = glob.glob(os.path.join(subdir_path, "*.txt"))
+                for txt_file in tqdm.tqdm(subdir_file_paths, desc=desc):
+                    try:
+                        with open(txt_file, 'r', encoding='utf-8') as f:
+                            texts.append(f.read())
+                    except Exception as e:
+                        print(f"Error loading file {txt_file}: {e}")
+            return texts # Return texts found in subdirectories
+
+    # Process direct files (if any) or if no subdirectories with files were found
+    desc = f"{desc_prefix} {current_desc_base}"
+    for txt_file in tqdm.tqdm(file_paths, desc=desc):
         try:
             with open(txt_file, 'r', encoding='utf-8') as f:
                 texts.append(f.read())
@@ -39,7 +67,7 @@ def main():
     for domain in DOMAINS:
         human_domain_path = os.path.join(BASE_RAW_DATA_PATH, domain, "human")
         print(f"Loading from: {human_domain_path}")
-        domain_human_texts = load_english_txt_files(human_domain_path)
+        domain_human_texts = load_english_txt_files(human_domain_path, desc_prefix=f"Processing {domain}/human in")
         all_human_texts.extend(domain_human_texts)
         print(f"Loaded {len(domain_human_texts)} texts from {domain}/human. Total human texts: {len(all_human_texts)}")
 
