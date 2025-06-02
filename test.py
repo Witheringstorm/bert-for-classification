@@ -1,6 +1,6 @@
 import pandas as pd
 
-file_path = '/public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_en/data/processed/train_en.csv'
+file_path = '/public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_en/data/processed/wp/test_en.csv'
 df = pd.read_csv(file_path)
 number_of_entries = len(df)
 # Or, equivalently: number_of_entries = df.shape[0]

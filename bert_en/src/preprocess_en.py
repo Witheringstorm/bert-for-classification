@@ -7,11 +7,12 @@ import random # Added for sampling
 
 # Configuration for English data preprocessing
 BASE_RAW_DATA_PATH = "/public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/Dataset/ghostbuster-data"
-PROCESSED_DATA_OUTPUT_PATH = "/public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_en/data/processed" # Relative to bert_en/src/
+PROCESSED_DATA_OUTPUT_PATH = "/public/share/yinxiangrong/qinxiaoyu/kdc2024/S/nlp/proj/bert_en/data/processed/essay" # Relative to bert_en/src/
 os.makedirs(PROCESSED_DATA_OUTPUT_PATH, exist_ok=True)
 
 # Define the domains and LLM types to include
-DOMAINS = ["wp", "reuter", "essay"] # Add other domains if present and relevant
+# DOMAINS = ["wp", "reuter", "essay"] # Add other domains if present and relevant
+DOMAINS = ["essay"]
 LLM_TYPES = ["gpt", "claude"] # Add other LLM generator types if present and relevant
 
 def load_english_txt_files(directory_path, desc_prefix="Processing files in"):
@@ -115,38 +116,71 @@ def main():
         return
 
     # Split data
-    num_unique_labels = len(set(all_labels))
-    can_stratify = False
-    if num_unique_labels > 1:
-        label_counts = pd.Series(all_labels).value_counts()
-        if all(count >= 2 for count in label_counts):
-            can_stratify = True
-        else:
-            print("Warning: Not all classes have at least 2 samples for stratification. Stratification will be disabled.")
-    elif num_unique_labels == 1:
-        print("Warning: Only one class present in the data. Stratification will be disabled.")
-    else:
-        print("No labels found. Cannot stratify.")
+    # Ensure there are enough samples in each class for stratification
+    min_samples_for_stratify_initial = 2 * len(set(all_labels)) # At least 2 samples per class for the initial split
+    can_stratify_initial = (len(set(all_labels)) > 1 and
+                    all(pd.Series(all_labels).value_counts() >= min_samples_for_stratify_initial // len(set(all_labels))))
 
-    train_texts, test_texts, train_labels, test_labels = train_test_split(
+    # First split: 80% train, 20% temp (for validation + test)
+    train_texts, temp_texts, train_labels, temp_labels = train_test_split(
         all_texts, all_labels, test_size=0.2, random_state=42,
-        stratify=all_labels if can_stratify else None
+        stratify=all_labels if can_stratify_initial else None
     )
 
-    print(f"\nEnglish data (balanced): {len(train_texts)} train, {len(test_texts)} test examples.")
+    # Second split: 50% of temp for validation, 50% for test (making it 10% val, 10% test of original)
+    # Check stratification for the temporary set
+    min_samples_for_stratify_temp = 2 * len(set(temp_labels)) if temp_labels else 0
+    can_stratify_temp = False
+    if temp_labels and len(set(temp_labels)) > 1:
+        temp_label_counts = pd.Series(temp_labels).value_counts()
+        # Ensure at least 1 sample per class for the second split if stratifying, and that the number of samples is enough for stratification
+        if all(count >= 1 for count in temp_label_counts) and all(count >= (min_samples_for_stratify_temp // len(set(temp_labels)) if len(set(temp_labels)) > 0 else 0) for count in temp_label_counts):
+            can_stratify_temp = True
+        else:
+            print(f"Warning: Cannot stratify temp split for English data. Label counts: {temp_label_counts}. Min samples required per class for strat: {min_samples_for_stratify_temp // len(set(temp_labels)) if len(set(temp_labels)) > 0 else 'N/A'}")
+    elif temp_labels and len(set(temp_labels)) == 1:
+        print("Warning: Only one class present in the temporary English data for val/test split. Stratification disabled for this split.")
+    elif not temp_labels:
+        print("Warning: temp_labels is empty for English data. Cannot perform validation/test split.")
+        # Handle case where temp_labels might be empty or too small
+        val_texts, test_texts, val_labels, test_labels = [], [], [], []
+
+    if temp_texts: # Proceed only if temp_texts is not empty
+        val_texts, test_texts, val_labels, test_labels = train_test_split(
+            temp_texts, temp_labels, test_size=0.5, random_state=42, # 0.5 of 0.2 gives 0.1 for test
+            stratify=temp_labels if can_stratify_temp else None
+        )
+        print(f"\nEnglish data (balanced): {len(train_texts)} train, {len(val_texts)} validation, {len(test_texts)} test examples.")
+    else: # temp_texts was empty
+        val_texts, test_texts, val_labels, test_labels = [], [], [], []
+        print(f"\nEnglish data (balanced): {len(train_texts)} train. Validation and test sets are empty due to insufficient data in temp split.")
 
     # Save to CSV
     df_train = pd.DataFrame({'text': train_texts, 'label': train_labels})
+    df_val = pd.DataFrame({'text': val_texts, 'label': val_labels})
     df_test = pd.DataFrame({'text': test_texts, 'label': test_labels})
 
     train_output_file = os.path.join(PROCESSED_DATA_OUTPUT_PATH, "train_en.csv")
+    val_output_file = os.path.join(PROCESSED_DATA_OUTPUT_PATH, "val_en.csv")
     test_output_file = os.path.join(PROCESSED_DATA_OUTPUT_PATH, "test_en.csv")
 
-    df_train.to_csv(train_output_file, index=False, encoding='utf-8')
-    df_test.to_csv(test_output_file, index=False, encoding='utf-8')
+    if not df_train.empty:
+        df_train.to_csv(train_output_file, index=False, encoding='utf-8')
+        print(f"Saved English training data to: {train_output_file}")
+    else:
+        print(f"English training data is empty. Skipping save for {train_output_file}")
 
-    print(f"Saved English training data to: {train_output_file}")
-    print(f"Saved English testing data to: {test_output_file}")
+    if not df_val.empty:
+        df_val.to_csv(val_output_file, index=False, encoding='utf-8')
+        print(f"Saved English validation data to: {val_output_file}")
+    else:
+        print(f"English validation data is empty. Skipping save for {val_output_file}")
+
+    if not df_test.empty:
+        df_test.to_csv(test_output_file, index=False, encoding='utf-8')
+        print(f"Saved English testing data to: {test_output_file}")
+    else:
+        print(f"English testing data is empty. Skipping save for {test_output_file}")
 
 if __name__ == "__main__":
     main() 
