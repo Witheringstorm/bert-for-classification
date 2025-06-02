@@ -4,14 +4,10 @@
 
 | Class         | Precision | Recall | F1-Score | Support |
 | ------------- | --------- | ------ | -------- | ------- |
-| **Human (0)** | 0.98      | 0.99   | 0.98     | 398     |
-| **LLM (1)**   | 0.99      | 0.97   | 0.98     | 400     |
+| **Human (0)** | 0.99      | 0.99   | 0.99     | 598     |
+| **LLM (1)**   | 0.99      | 0.99   | 0.99     | 600     |
 
-* **Accuracy**: `0.98` (798 samples)
-
-* **Macro Avg**: Precision = `0.98`, Recall = `0.98`, F1 = `0.98`
-
-* **Weighted Avg**: Precision = `0.98`, Recall = `0.98`, F1 = `0.98`
+* **Accuracy**: `0.99` (1198 samples)
 
 ---
 
